@@ -1,19 +1,22 @@
 # Emlak Pro
 
-Real-time real estate operations platform for consultants who need to catch new listings quickly, match them against saved filters, and manage the follow-up workflow from web and mobile clients.
+Real-time owner-listed property lead discovery platform for real estate consultants.
 
-This repository is structured as a production-oriented monorepo. It demonstrates backend API design, real-time delivery, database modeling, and multi-platform client architecture.
+Emlak Pro is designed as a bot-driven system that helps real estate agents find newly published property listings posted directly by owners instead of agencies. Agents can define their own criteria, monitor matching listings in real time, and use those opportunities to contact owners for sales or rental representation.
+
+This repository is structured as a production-oriented monorepo. It demonstrates backend API design, source ingestion, real-time delivery, database modeling, and multi-platform client architecture.
 
 ## Why This Project Exists
 
-Real estate consultants often monitor multiple listing filters manually and lose valuable time before a relevant listing is noticed. Emlak Pro is designed to automate that workflow:
+For real estate agents, owner-listed properties are high-value sales leads. These listings are time-sensitive because multiple agencies may try to reach the same owner. Emlak Pro is designed to automate that discovery workflow:
 
-- create saved listing bots/filters
-- ingest and normalize listing data
-- deduplicate listings from the source
+- create saved bots with custom listing criteria
+- detect new owner-listed properties from the target source
+- filter out agency-listed inventory where possible
+- normalize and deduplicate listing data
 - match listings to user-owned bots
-- deliver matches instantly to web and mobile clients
-- track listing state with notes, favorites, and workflow status
+- deliver matching leads instantly to web and mobile clients
+- track follow-up state with notes, favorites, and workflow status
 
 The first target source is Sahibinden. The ingestion strategy is treated as the riskiest part of the product and is documented separately under `docs/phase-0-validation.md`.
 
@@ -58,17 +61,19 @@ docs/       product blueprint and validation notes
 ## Core Product Modules
 
 - Authentication and identity with user-owned accounts
-- Bot builder for saved real estate filters
-- Listing ingestion and normalization pipeline
+- Bot builder for saved lead criteria such as city, district, price range, room count, square meters, and property type
+- Listing ingestion and normalization pipeline for Sahibinden-sourced data
+- Owner-listed versus agency-listed classification boundary
 - Matching layer between listings, users, and bots
-- Live feed for real-time listing delivery
-- Listing workflow state: notes, favorites, and status tracking
-- Future extension points for groups, push notifications, AI, automation, and analytics packs
+- Live feed for real-time lead delivery
+- Listing workflow state: call status, notes, favorites, and follow-up tracking
+- Future extension points for teams, push notifications, AI lead scoring, automation, and analytics packs
 
 ## Backend Design Highlights
 
 - Listings are stored as a single canonical source of truth.
 - User/bot matches are modeled separately from the listing itself.
+- Owner/agency classification is kept as part of the ingestion and normalization boundary.
 - User-specific workflow state is kept outside the listing entity.
 - Realtime delivery is handled through Socket.IO gateway modules.
 - Ingestion has its own guarded endpoint and adapter boundary.
@@ -159,7 +164,8 @@ pnpm --filter web build
 
 This repository is intended to show how I approach a real product from both product and engineering perspectives:
 
+- I modeled the product around a concrete business use case: helping real estate agents discover owner-listed leads faster.
 - I started with the highest-risk technical assumptions instead of only UI screens.
-- The architecture separates API, web, mobile, data, and realtime concerns.
-- The data model is designed around ownership, deduplication, and future collaboration features.
+- The architecture separates API, web, mobile, data, ingestion, and realtime concerns.
+- The data model is designed around ownership, deduplication, matching, and future collaboration features.
 - The codebase is kept as a monorepo to make shared typing and cross-platform development easier.

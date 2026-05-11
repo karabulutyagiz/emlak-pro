@@ -2,15 +2,16 @@
 
 ## Product Goal
 
-Emlak danismanlari icin yeni ilanlari filtreye gore anlik yakalayan, kullanicinin kendi paneline ve mobil uygulamasina canli dusuren, sonradan grup ve premium otomasyonlarla genisleyen operasyon platformu.
+Emlak danismanlari icin Sahibinden uzerindeki kisi tarafindan yayinlanan ilanlari filtreye gore anlik yakalayan, danismanin kendi kriterlerine uyan lead'leri web ve mobil uygulamaya canli dusuren operasyon platformu.
 
 ## Non-Negotiables
 
 - Veri kaynagi ilk asamada `Sahibinden`
+- Ana odak emlak ofisi tarafindan degil, mal sahibi / kisi tarafindan yayinlanan ilanlari yakalamak
 - Hedef algilama suresi `1-5 saniye`, kabul edilebilir ust sinir `30 saniye`
 - `Web + iOS + Android` ayni urunun parcalari olacak
 - Kullanici sahipligi `kisi bazli`
-- Her eslesme `anlik` kullaniciya gorunmeli
+- Her eslesme `anlik` kullaniciya lead olarak gorunmeli
 - Ilan tek kayit tutulacak, hangi botlarla eslestigi ayrica tutulacak
 - Grup mantigi kullanici istegine bagli katman olacak
 - 8 haneli sadece rakamlardan olusan benzersiz `userId` uretilecek
