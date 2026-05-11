@@ -1,0 +1,15 @@
+node_modules
+.turbo
+.next
+dist
+build
+.expo
+.expo-shared
+coverage
+.env
+.env.*
+!.env.example
+pnpm-lock.yaml
+*.log
+*.tsbuildinfo
+DS_Store

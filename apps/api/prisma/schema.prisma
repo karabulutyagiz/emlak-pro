@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum UserRole {
+  MUHASEBE
+  YONETIM
+  OPERASYON
+}
+
+enum ListingLifecycle {
+  NEW
+  UPDATED
+  PRICE_CHANGED
+  REMOVED
+}
+
+enum ListingWorkflowStatus {
+  NEW
+  TO_CALL
+  CALLED
+  APPOINTMENT
+  SUITABLE
+  PASSED
+  LOST
+}
+
+model User {
+  id            String             @id @default(cuid())
+  publicId      String             @unique
+  email         String             @unique
+  passwordHash  String
+  displayName   String
+  phoneNumber   String?
+  role          UserRole           @default(OPERASYON)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  sessions      AuthSession[]
+  bots          Bot[]
+  memberships   GroupMember[]
+  listingStates UserListingState[]
+  notes         Note[]
+  matches       ListingMatch[]
+  passwordSetupTokens PasswordSetupToken[]
+}
+
+model AuthSession {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Group {
+  id          String        @id @default(cuid())
+  name        String
+  createdById String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  members     GroupMember[]
+}
+
+model GroupMember {
+  id        String         @id @default(cuid())
+  groupId   String
+  userId    String
+  role      MembershipRole @default(MEMBER)
+  createdAt DateTime       @default(now())
+  group     Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+}
+
+model Bot {
+  id          String         @id @default(cuid())
+  userId      String
+  name        String
+  isActive    Boolean        @default(true)
+  city        String?
+  district    String?
+  neighborhood String?
+  minPrice    Int?
+  maxPrice    Int?
+  roomCount   String?
+  minAreaM2   Int?
+  maxAreaM2   Int?
+  keywords    String[]
+  excludedKeywords String[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  matches     ListingMatch[]
+}
+
+model Listing {
+  id              String             @id @default(cuid())
+  source          String
+  sourceListingId String
+  title           String
+  canonicalUrl    String             @unique
+  city            String?
+  district        String?
+  neighborhood    String?
+  price           Int?
+  currency        String?
+  roomCount       String?
+  grossAreaM2     Int?
+  netAreaM2       Int?
+  buildingAge     String?
+  floor           String?
+  description     String?
+  primaryImageUrl String?
+  mediaUrls       String[]
+  lifecycle       ListingLifecycle   @default(NEW)
+  firstSeenAt     DateTime           @default(now())
+  lastSeenAt      DateTime           @default(now())
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  matches         ListingMatch[]
+  notes           Note[]
+  states          UserListingState[]
+
+  @@unique([source, sourceListingId])
+}
+
+model ListingMatch {
+  id          String    @id @default(cuid())
+  listingId   String
+  userId      String
+  botId       String
+  matchedAt   DateTime  @default(now())
+  score       Int?
+  listing     Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bot         Bot       @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, userId, botId])
+}
+
+model UserListingState {
+  id          String                @id @default(cuid())
+  userId      String
+  listingId   String
+  isFavorite  Boolean               @default(false)
+  status      ListingWorkflowStatus @default(NEW)
+  lastViewedAt DateTime?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing     Listing               @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+}
+
+model Note {
+  id         String   @id @default(cuid())
+  userId     String
+  listingId  String
+  body       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing    Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model PasswordSetupToken {
+  id         String   @id @default(cuid())
+  userId     String
+  token      String   @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

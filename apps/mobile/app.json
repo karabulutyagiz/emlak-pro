@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Webico EMLAK",
+    "slug": "webico-emlak",
+    "scheme": "webicoemlak",
+    "orientation": "portrait",
+    "platforms": ["ios", "android"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
